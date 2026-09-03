@@ -373,6 +373,8 @@ export interface StudentPayload {
   city?: string;
   phone?: string;
   email?: string;
+  password?: string;
+  password_confirmation?: string;
   status: StudentStatus;
   class_id?: number | null;
   guardian?: GuardianPayload | null;

@@ -57,6 +57,8 @@ const emptyForm: StudentPayload = {
   city: "",
   phone: "",
   email: "",
+  password: "",
+  password_confirmation: "",
   status: "active",
   class_id: null,
   guardian: {
@@ -184,6 +186,8 @@ export default function StudentsPage() {
       city: item.city ?? "",
       phone: item.phone ?? "",
       email: item.email ?? "",
+      password: "",
+      password_confirmation: "",
       status: item.status,
       class_id: item.current_class?.id ?? null,
       guardian: guardian
@@ -482,6 +486,40 @@ export default function StudentsPage() {
               </option>
             ))}
           </Select>
+
+          <div className="rounded-lg border border-indigo-100 bg-indigo-50/50 p-4">
+            <p className="mb-1 text-sm font-semibold text-indigo-800">
+              {t("students.login_account")}
+            </p>
+            <p className="mb-3 text-xs text-slate-500">
+              {t("students.login_hint")}
+            </p>
+            <div className="grid grid-cols-1 gap-4">
+              <Input
+                type="email"
+                label={t("students.email")}
+                value={form.email}
+                onChange={(event) => setForm({ ...form, email: event.target.value })}
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  type="password"
+                  label={t("students.password")}
+                  value={form.password}
+                  onChange={(event) => setForm({ ...form, password: event.target.value })}
+                  placeholder={editing ? t("students.password_edit_placeholder") : ""}
+                />
+                <Input
+                  type="password"
+                  label={t("students.password_confirmation")}
+                  value={form.password_confirmation}
+                  onChange={(event) =>
+                    setForm({ ...form, password_confirmation: event.target.value })
+                  }
+                />
+              </div>
+            </div>
+          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <Input

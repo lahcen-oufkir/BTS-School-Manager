@@ -50,6 +50,9 @@ class StudentModuleTest extends TestCase
             'cne' => 'A001234567',
             'student_number' => 'S-2026-001',
             'gender' => 'male',
+            'email' => 'yassine@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
             'class_id' => $class->id,
             'guardian' => [
                 'first_name' => 'Nadia',
@@ -68,6 +71,8 @@ class StudentModuleTest extends TestCase
         $this->assertNotNull($student);
         $this->assertTrue($student->classes()->where('classes.id', $class->id)->exists());
         $this->assertDatabaseHas('enrollments', ['student_id' => $student->id, 'class_id' => $class->id]);
+        $this->assertSame('student', $student->user->role);
+        $this->assertSame('yassine@example.com', $student->user->email);
     }
 
     public function test_establishment_admin_cannot_create_student_for_other_school(): void
@@ -76,6 +81,9 @@ class StudentModuleTest extends TestCase
             'school_id' => $this->schoolB->id,
             'first_name' => 'Hack',
             'last_name' => 'User',
+            'email' => 'hack@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
         ]);
 
         $response->assertStatus(404);
@@ -204,6 +212,9 @@ class StudentModuleTest extends TestCase
             'last_name' => 'Chraibi',
             'cne' => 'A003322110',
             'status' => 'active',
+            'email' => 'karim@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
             'class_id' => $class->id,
         ]);
         $store->assertStatus(201);
@@ -219,9 +230,13 @@ class StudentModuleTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.current_class.id', $class->id);
 
+        $userId = Student::find($studentId)->user_id;
+        $this->assertNotNull($userId);
+
         $this->actingAs($this->systemAdmin, 'sanctum')->deleteJson("/api/v1/students/{$studentId}")
             ->assertOk();
         $this->assertSoftDeleted('students', ['id' => $studentId]);
+        $this->assertNull(User::find($userId));
     }
 
     private function createClass(int $schoolId): array

@@ -9,6 +9,7 @@ use App\Models\AttendanceRecord;
 use App\Models\AttendanceSession;
 use App\Models\Grade;
 use App\Models\Program;
+use App\Models\School;
 use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\Subject;
@@ -303,11 +304,19 @@ class ReportController extends Controller
     {
         $user = $request->user();
 
-        if ($request->user()->isEstablishmentAdmin()) {
+        if ($user->isEstablishmentAdmin()) {
             return $user->school_id;
         }
 
-        return (int) ($request->input('school_id') ?: $user->school_id);
+        if ($request->filled('school_id')) {
+            return (int) $request->input('school_id');
+        }
+
+        if ($user->school_id) {
+            return (int) $user->school_id;
+        }
+
+        return School::value('id') ?? 0;
     }
 
     private function resolveYearId(Request $request, int $schoolId): ?int

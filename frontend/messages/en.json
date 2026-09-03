@@ -88,7 +88,12 @@
     "status_transferred": "Transferred",
     "status_withdrawn": "Withdrawn",
     "status_suspended": "Suspended",
-    "status_inactive": "Inactive"
+    "status_inactive": "Inactive",
+    "login_account": "Login account",
+    "login_hint": "Set or update the email and password the student will use to access their account.",
+    "password": "Password",
+    "password_confirmation": "Confirm password",
+    "password_edit_placeholder": "Leave blank to keep the current password"
   },
   "teachers": {
     "title": "Teachers",

@@ -88,7 +88,12 @@
     "status_transferred": "محوّل",
     "status_withdrawn": "منسحب",
     "status_suspended": "موقوف",
-    "status_inactive": "غير نشط"
+    "status_inactive": "غير نشط",
+    "login_account": "حساب الدخول",
+    "login_hint": "اضبط أو حدّث البريد الإلكتروني وكلمة المرور التي سيستعملها الطالب للولوج إلى حسابه.",
+    "password": "كلمة المرور",
+    "password_confirmation": "تأكيد كلمة المرور",
+    "password_edit_placeholder": "اتركها فارغة للحفاظ على كلمة المرور الحالية"
   },
   "teachers": {
     "title": "المدرسون",

@@ -21,8 +21,8 @@ export interface ReportFilters {
 
 export async function fetchReportSummary(filters: ReportFilters = {}): Promise<ReportSummary> {
   try {
-    const { data } = await api.get<ReportSummary>("/reports/summary", { params: filters });
-    return data;
+    const { data } = await api.get("/reports/summary", { params: filters });
+    return { ...data.data, grades: data.grades, attendance: data.attendance };
   } catch (error) {
     return handleError(error);
   }

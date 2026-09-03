@@ -88,7 +88,12 @@
     "status_transferred": "Transféré",
     "status_withdrawn": "Retiré",
     "status_suspended": "Suspendu",
-    "status_inactive": "Inactif"
+    "status_inactive": "Inactif",
+    "login_account": "Compte de connexion",
+    "login_hint": "Créez ou modifiez l'email et le mot de passe que l'étudiant utilisera pour se connecter à son espace.",
+    "password": "Mot de passe",
+    "password_confirmation": "Confirmer le mot de passe",
+    "password_edit_placeholder": "Laisser vide pour garder le mot de passe actuel"
   },
   "teachers": {
     "title": "Enseignants",

@@ -9,6 +9,7 @@ use App\Http\Resources\StudentResource;
 use App\Models\AcademicYear;
 use App\Models\SchoolClass;
 use App\Models\Student;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -49,11 +50,13 @@ class StudentController extends Controller
             return response()->json(['message' => 'Resource not found.'], 404);
         }
 
-        $data = $this->guardianlessData($request->validated());
+        $schoolId = $request->user()->isEstablishmentAdmin()
+            ? $request->user()->school_id
+            : (int) $request->input('school_id');
 
-        if ($request->user()->isEstablishmentAdmin()) {
-            $data['school_id'] = $request->user()->school_id;
-        }
+        $data = $this->guardianlessData($request->validated());
+        unset($data['email'], $data['password'], $data['password_confirmation']);
+        $data['school_id'] = $schoolId;
 
         $student = Student::create($data);
 
@@ -63,8 +66,19 @@ class StudentController extends Controller
 
         $this->syncEnrollment($student, $request->input('class_id'));
 
+        $user = User::create([
+            'name' => trim($request->input('first_name').' '.$request->input('last_name')),
+            'email' => $request->input('email'),
+            'password' => $request->input('password'),
+            'role' => 'student',
+            'is_active' => true,
+            'school_id' => $schoolId,
+        ]);
+
+        $student->update(['user_id' => $user->id]);
+
         return (new StudentResource(
-            $student->load(['school', 'guardians'])->loadCount('guardians')
+            $student->load(['school', 'guardians', 'user'])->loadCount('guardians')
         ))->response()->setStatusCode(201);
     }
 
@@ -87,12 +101,39 @@ class StudentController extends Controller
         }
 
         $data = $this->guardianlessData($request->validated());
+        unset($data['email'], $data['password'], $data['password_confirmation']);
 
         if ($request->user()->isEstablishmentAdmin()) {
             unset($data['school_id']);
         }
 
         $student->update($data);
+
+        if ($request->has('email') || $request->has('password')) {
+            $userPayload = [];
+
+            if ($request->has('email')) {
+                $userPayload['email'] = $request->input('email');
+            }
+
+            if ($request->has('password')) {
+                $userPayload['password'] = $request->input('password');
+            }
+
+            if ($student->user) {
+                $student->user->update($userPayload);
+            } elseif ($request->has('email')) {
+                $user = User::create([
+                    'name' => trim($request->input('first_name', $student->first_name).' '.$request->input('last_name', $student->last_name)),
+                    'email' => $request->input('email'),
+                    'password' => $request->input('password') ?? 'changeme123',
+                    'role' => 'student',
+                    'is_active' => true,
+                    'school_id' => $student->school_id,
+                ]);
+                $student->update(['user_id' => $user->id]);
+            }
+        }
 
         if ($request->filled('guardian')) {
             $guardian = $request->input('guardian');
@@ -116,7 +157,7 @@ class StudentController extends Controller
         }
 
         return new StudentResource(
-            $student->fresh()->load(['school', 'guardians'])->loadCount('guardians')
+            $student->fresh()->load(['school', 'guardians', 'user'])->loadCount('guardians')
         );
     }
 
@@ -125,6 +166,8 @@ class StudentController extends Controller
         if ($request->user()->isEstablishmentAdmin() && $student->school_id !== $request->user()->school_id) {
             return response()->json(['message' => 'Resource not found.'], 404);
         }
+
+        $student->user()?->delete();
 
         $student->delete();
 
