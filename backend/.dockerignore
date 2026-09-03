@@ -1,0 +1,8 @@
+.env
+.git
+.gitignore
+vendor
+storage/logs/*.log
+docker
+Dockerfile
+node_modules
